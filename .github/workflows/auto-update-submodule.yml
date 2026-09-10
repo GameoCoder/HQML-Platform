@@ -8,18 +8,15 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout parent code base
       - name: Checkout Parent
         uses: actions/checkout@v4
         with:
           submodules: true
 
-      # 2. Pull the latest commit inside the submodule folder
       - name: Update Submodule
         run: |
           git submodule update --init --recursive --remote -f
 
-      # 3. Commit the change using standard Git config
       - name: Commit and Push
         run: |
           git config --global user.name "GitHub Action Bot"
