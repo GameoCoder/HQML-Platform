@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #050406;
+  color: #f3eef0;
+  font-family: 'Inter', ui-sans-serif, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom futuristic cursor styling for fine pointers */
+@media (pointer: fine) {
+  body, button, a, input, textarea, select, [role="button"] {
+    cursor: crosshair;
+  }
+}
+
+::selection {
+  background: rgba(216, 27, 64, 0.35);
+  color: #fff2f4;
+}
+
+/* Slim, quiet scrollbar so it doesn't fight the glass surfaces */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+:focus-visible {
+  outline: 2px solid rgba(255, 143, 163, 0.7);
+  outline-offset: 2px;
+}
+
+/* Fine grain noise, layered under the UI to keep the void from feeling flat */
+.noise-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.font-display {
+  font-family: 'Space Grotesk', ui-sans-serif, sans-serif;
+}
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Glowing cyber holographic animations */
+@keyframes cyber-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(216, 27, 64, 0.4), inset 0 0 10px rgba(255, 143, 163, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(216, 27, 64, 0.8), inset 0 0 20px rgba(255, 143, 163, 0.4);
+  }
+}
+
+.cyber-glow {
+  animation: cyber-glow-pulse 3s infinite ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

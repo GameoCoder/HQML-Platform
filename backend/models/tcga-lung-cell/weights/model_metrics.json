@@ -1,0 +1,20 @@
+{
+  "vqc_14q": {
+    "accuracy": 0.982,
+    "sensitivity": 1.0,
+    "specificity": 0.8,
+    "auc_roc": 1.0
+  },
+  "rf": {
+    "accuracy": 0.982,
+    "sensitivity": 1.0,
+    "specificity": 0.8,
+    "auc_roc": 1.0
+  },
+  "svm": {
+    "accuracy": 0.982,
+    "sensitivity": 1.0,
+    "specificity": 0.8,
+    "auc_roc": 1.0
+  }
+}

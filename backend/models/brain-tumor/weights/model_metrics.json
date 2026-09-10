@@ -1,0 +1,81 @@
+{
+  "module_id": "brain-mri-dataset",
+  "module_name": "Brain Tumor MRI Classification",
+  "description": "4-Class classification (Glioma, Meningioma, No Tumor, Pituitary) using Hybrid ResNet-50 feature extraction and a 14-qubit cuQuantum simulator.",
+  "dataset_metadata": {
+    "total_samples": 7200,
+    "train_samples": 5600,
+    "test_samples": 1600,
+    "num_classes": 4,
+    "baseline_random_accuracy": 0.25,
+    "image_dimensions": "224x224x3"
+  },
+  "hardware_environment": {
+    "gpu_target": "NVIDIA RTX 2050 (4GB VRAM)",
+    "quantum_backend": "lightning.gpu",
+    "deep_learning_framework": "PyTorch",
+    "llm_engine": "Ollama (qwen2.5)"
+  },
+  "models": {
+    "primary_quantum": {
+      "id": "hybrid_resnet_vqc_14q",
+      "name": "Hybrid ResNet-50 + 14-Qubit VQC",
+      "type": "Quantum-Classical Hybrid",
+      "architecture": {
+        "backbone": "Frozen ResNet-50 (2048D Latent Space)",
+        "bottleneck": "PCA (14 Components)",
+        "qubits_used": 14,
+        "circuit_depth": 4,
+        "entanglement_strategy": "StronglyEntanglingLayers",
+        "measurement": "4-Qubit Pauli-Z Multi-Observable",
+        "scaling_method": "MinMax [0, π]"
+      },
+      "test_benchmarks": {
+        "accuracy": 0.72,
+        "macro_recall": 0.72,
+        "macro_specificity": 0.9071,
+        "f1_score": 0.71
+      },
+      "clinical_highlights": {
+        "notumor_recall": 0.99,
+        "glioma_meningioma_overlap_warning": true,
+        "note": "Exceptional sensitivity (99%) in isolating healthy baseline tissues."
+      }
+    },
+    "classical_baselines": [
+      {
+        "id": "rf",
+        "name": "Random Forest",
+        "type": "Classical Ensemble",
+        "test_benchmarks": {
+          "accuracy": 0.85,
+          "macro_recall": 0.85,
+          "macro_specificity": 0.9512,
+          "f1_score": 0.85
+        }
+      },
+      {
+        "id": "svm",
+        "name": "Support Vector Machine",
+        "type": "Classical Kernel",
+        "test_benchmarks": {
+          "accuracy": 0.84,
+          "macro_recall": 0.84,
+          "macro_specificity": 0.9454,
+          "f1_score": 0.83
+        }
+      },
+      {
+        "id": "mlp",
+        "name": "Multi-Layer Perceptron",
+        "type": "Classical Neural Network",
+        "test_benchmarks": {
+          "accuracy": 0.83,
+          "macro_recall": 0.83,
+          "macro_specificity": 0.9423,
+          "f1_score": 0.82
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,282 @@
+backend/
+	- models/
+		- tcga-gene-exp/
+			- model-weights/
+			- model-1/
+			- model-2/
+			- model-3/
+			- inference.py (controls the actual inference of models and pipes output to the main controller)
+		- breast-cancer-dataset/
+			- model-weights/
+			- model-1/
+			- model-2/
+			- inference.py
+	- inferenceController.py (Controls which inference controller to activate.. i.e. tcga-gene-exp/inference.py or xyz-dataset/inference.py based on the request)
+
+```text
+backend/
+├── main.py                     # Initializes FastAPI and CORS (allows frontend to talk to it)
+├── api/
+│   ├── __init__.py
+│   └── routes.py               # The API endpoints (e.g., POST /api/predict/tcga)
+├── controllers/
+│   ├── __init__.py
+│   └── inference_controller.py # Routes the request to the correct dataset folder
+├── models/
+│   ├── tcga-lung-cell/
+│   │   ├── weights/            # Put your 3 .joblib scalers, 3 classical models, and 1 .pt here
+│   │   ├── __init__.py
+│   │   └── inference.py        # Contains your combined VQC and Classical inference logic
+│   └── breast-cancer-dataset/  # Placeholder for future expansion
+│       ├── weights/
+│       ├── __init__.py
+│       └── inference.py
+└── requirements.txt            # pennylane, pennylane-lightning-gpu, torch, fastapi, scikit-learn, etc.
+
+> I need to build a modular, scalable backend using **FastAPI** to serve a Hybrid Quantum Machine Learning platform. The API needs to receive patient data, route it to the correct disease-specific inference engine, and return a unified JSON response.
+> **Directory Structure Required:**
+> ```text
+> backend/
+> ├── main.py
+> ├── api/
+> │   └── routes.py
+> ├── controllers/
+> │   └── inference_controller.py
+> └── models/
+>     ├── tcga-lung-cell/
+>     │   └── inference.py
+>     └── breast-cancer-dataset/
+>         └── inference.py
+> 
+> ```
+> 
+> 
+> **Implementation Details:**
+> 1. **`main.py`**: Initialize the FastAPI app. Add CORSMiddleware to allow all origins. Include the router from `api/routes.py`.
+> 2. **`api/routes.py`**: Create a `POST` endpoint `/api/predict/{dataset_id}`. It should accept a file upload (`UploadFile`) representing a single patient's raw TSV data. Pass the `dataset_id` and the file contents to the `inference_controller`.
+> 3. **`controllers/inference_controller.py`**: Create a factory function that takes the `dataset_id` (e.g., "tcga-lung-cell"). If the ID matches, dynamically import the `run_inference` function from `models.tcga_lung_cell.inference` and execute it, returning the JSON. If the ID is unknown, return an HTTP 404 error.
+> 4. **`models/tcga-lung-cell/inference.py`**: Create a placeholder function `def run_inference(patient_data_bytes):` that returns a mocked Python dictionary containing a merged response of Quantum and Classical models (include dummy latency, prediction, and confidence). I will paste my actual PyTorch/PennyLane/Scikit-Learn inference code here later.
+> 
+> 
+> Please generate the code for these 4 files using standard best practices, type hinting, and Pydantic where appropriate.
+
+
+
+agy --conversation=3de2c749-614a-4894-99b6-052b35c33c58
+Response:
+"### How to Run the Server
+  Activate the virtual environment or run directly with .venv:
+    # Option 1: Using the virtual environment's uvicorn binary
+    ./.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+    # Option 2: Activate the environment first
+    source .venv/bin/activate
+    uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+  ### Running Tests
+  Run the test suite via the virtual environment:
+    ./.venv/bin/python -m pytest tests/test_api.py -v
+  ### Sample cURL Request
+    curl -X POST "http://localhost:8000/api/predict/tcga-lung-cell" \
+         -H "Accept: application/json" \
+         -F "file=@patient_data.tsv"
+
+
+Dummy Request
+1. curl -X POST "http://localhost:8000/api/predict/tcga-lung-cell?patient_idx=1" \
+         -H "Accept: application/json" \
+         -F "file=@patient_expression.tsv"
+
+2. curl -X POST "http://127.0.0.1:8000/api/predict/mri" \                                                                                                                                   
+         -F "file=@/path/to/your/scan.jpg"
+
+3. 
+
+
+
+
+Final Response:-
+{
+  "timestamp": "2026-09-06T16:53:41Z",
+  "dataset_analyzed": "tcga-lung-cell-squamous-gene-exp-dataset",
+  "primary_quantum_diagnosis": {
+    "model_id": "vqc_14q",
+    "prediction": "Normal",
+    "binary_class": 0,
+    "confidence_percentage": 70.8,
+    "quantum_expectation_value": -0.748,
+    "latency_ms": 185.8,
+    "qubits_used": 14,
+    "circuit_depth": 4
+  },
+  "classical_models": [
+    {
+      "id": "rf",
+      "name": "Random Forest",
+      "type": "Classical Ensemble",
+      "prediction": "Normal",
+      "confidence_percentage": 100.0,
+      "latency_ms": 4.09,
+      "status": "Ready"
+    },
+    {
+      "id": "svm",
+      "name": "Support Vector Machine",
+      "type": "Classical Kernel",
+      "prediction": "Normal",
+      "confidence_percentage": 98.35,
+      "latency_ms": 0.16,
+      "status": "Ready"
+    },
+    {
+      "id": "mlp",
+      "name": "Multi-Layer Perceptron",
+      "type": "Classical Neural Network",
+      "prediction": "Normal",
+      "confidence_percentage": 98.98,
+      "latency_ms": 0.13,
+      "status": "Ready"
+    }
+  ],
+  "status": "success"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+We are extending our existing FastAPI Hybrid Quantum Machine Learning backend (`tcga-lung-cell` disease detection pipeline). 
+
+### Objective:
+Implement an **Agentic RAG & Explainability Service** that runs automatically after the Quantum (14-qubit VQC) and Classical (RF, SVM, MLP) inferences complete. It will:
+1. Map the patient's most influential PCA components back to the actual genomic biomarkers (e.g., TP53, CDKN2A, SOX2) using the preloaded `pca_14.joblib` matrix.
+2. Query a local Ollama LLM instance (`qwen2.5:1.5b` -give me the option to change it in a config file- at `http://localhost:11434/api/generate`) via asynchronous HTTP (`httpx`) to dynamically generate an oncologist-style clinical summary.
+3. Merge this explainability data and clinical summary into the final API JSON response.
+4. Include a robust fallback mechanism so the API never crashes if Ollama is unreachable or times out during a live demo.
+
+---
+
+### Step-by-Step Implementation Details:
+
+#### 1. Biomarker Extraction (PCA to Gene Mapping)
+In `backend/models/tcga-lung-cell/`:
+- Extract the gene names from the uploaded file's Column 0 (`df.iloc[2:, 0].values.astype(str)`) or load a pre-cached gene list.
+- Calculate the patient's top 3 most active PCA components (highest absolute value in `x_pca[0]`).
+- For each active component, inspect `pca.components_[comp_idx]` to extract the top 2 genes with the highest absolute loading weights.
+- Construct the `explainability_shap` dictionary containing these biomarkers, their normalized component values, and directional risk impact ("increases_risk" or "decreases_risk").
+
+#### 2. Agentic RAG Service (`backend/services/rag_service.py` or similar)
+Create a standalone service with an `async def generate_clinical_summary(...)` function:
+- **Client**: Use `httpx.AsyncClient` with a strict **3.5-second timeout**.
+- **Endpoint**: `POST http://localhost:11434/api/generate`
+- **Model**: Default to `"qwen2.5:1.5b"` (make this configurable via environment variable or config).
+- **Prompt Engineering**: Provide a structured prompt to the LLM:
+  - Role: AI Oncologist specializing in squamous cell carcinoma.
+  - Inputs provided: Quantum diagnosis label, confidence %, expectation value, and the top active biomarkers extracted in Step 1.
+  - Constraint: Exactly 2 concise sentences highlighting key molecular findings and quantum correlation, followed by 3-4 comma-separated clinical keywords.
+- **Fail-Safe Fallback**: If Ollama times out, is not running, or returns a non-200 status code, log a warning and return a high-quality deterministic fallback summary without throwing an HTTP 500 error.
+
+#### 3. Update the Output JSON Schema
+Update the response returned by `dispatch_inference` / `/api/predict/tcga-lung-cell` so that the final payload matches this unified structure:
+
+```json
+{
+  "status": "success",
+  "timestamp": "2026-09-06T20:00:00Z",
+  "dataset_analyzed": "tcga-lung-cell-squamous-gene-exp-dataset",
+  "primary_quantum_diagnosis": {
+    "model_id": "vqc_14q",
+    "prediction": "Tumor",
+    "binary_class": 1,
+    "confidence_percentage": 94.57,
+    "quantum_expectation_value": 0.694,
+    "latency_ms": 175.0,
+    "qubits_used": 14,
+    "circuit_depth": 4
+  },
+  "classical_models": [
+    {
+      "id": "rf",
+      "name": "Random Forest",
+      "type": "Classical Ensemble",
+      "prediction": "Tumor",
+      "confidence_percentage": 96.0,
+      "latency_ms": 3.09,
+      "status": "Ready"
+    },
+    {
+      "id": "svm",
+      "name": "Support Vector Machine",
+      "type": "Classical Kernel",
+      "prediction": "Tumor",
+      "confidence_percentage": 98.03,
+      "latency_ms": 0.18,
+      "status": "Ready"
+    },
+    {
+      "id": "mlp",
+      "name": "Multi-Layer Perceptron",
+      "type": "Classical Neural Network",
+      "prediction": "Tumor",
+      "confidence_percentage": 100.0,
+      "latency_ms": 0.13,
+      "status": "Ready"
+    }
+  ],
+  "explainability_shap": {
+    "explainer_type": "PCA-Biomarker-Mapping",
+    "top_biomarkers": [
+      {
+        "gene_name": "TP53",
+        "pca_component": 0,
+        "loading_weight": 0.412,
+        "impact": "increases_risk"
+      }
+    ]
+  },
+  "clinical_summary": {
+    "key_findings": [
+      "Pronounced overexpression across squamous differentiation markers.",
+      "Quantum circuit entanglement captures multi-gene dependency across PCA components."
+    ],
+    "keywords": [
+      "Squamous Cell Carcinoma",
+      "TP53 Dysregulation",
+      "14-Qubit Entanglement"
+    ],
+    "llm_engine": "qwen2.5:1.5b (via Ollama)"
+  }
+}
+
+```
+
+#### 4. Testing & Verification
+
+* Ensure any new dependency (like `httpx`) is documented.
+* Update `tests/test_api.py` to mock the Ollama HTTP call during automated pytest runs so the test suite continues to pass 100% without requiring Ollama to run during CI/test execution.
+* Ensure the live server starts smoothly with `uvicorn main:app --reload`.
+
+
+
+
+
