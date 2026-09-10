@@ -1,26 +1,38 @@
-name: Auto Update Submodules
+name: Update Submodules on Trigger
 
 on:
   repository_dispatch:
-    types: [update-submodule]
+    types: [submodule_updated]
+  workflow_dispatch: # Keeps manual trigger active just in case
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
-      - name: Checkout Parent
+      # We use the PAT here too so that it has permission to clone the private submodule
+      - name: Checkout parent repository
         uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: 'recursive'
+          token: ${{ secrets.MAIN_REPO_UPDATE_TOKEN }} 
 
-      - name: Update Submodule
+      - name: Update submodules
         run: |
-          git submodule update --init --recursive --remote -f
+          git submodule update --remote --recursive --init
 
-      - name: Commit and Push
+      - name: Commit and push updates
         run: |
-          git config --global user.name "GitHub Action Bot"
-          git config --global user.email "actions@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@://github.com"
+          
           git add .
-          git commit -m "automation: updated submodule references" || echo "No changes to commit"
-          git push origin main
+          
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "chore: automated submodule update from dispatch"
+            git push origin HEAD:main # Change to your default branch name if needed
+          else
+            echo "No submodule updates found."
+          fi
