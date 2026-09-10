@@ -1,0 +1,6 @@
+[submodule "Classical-Models-Pipeline"]
+	path = Classical-Models-Pipeline
+	url = https://github.com/GameoCoder/Classical-Models-Pipeline
+[submodule "HQML-Pipeline"]
+	path = HQML-Pipeline
+	url = https://github.com/GameoCoder/HQML-Pipeline
